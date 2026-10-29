@@ -1,0 +1,28 @@
+{
+    "repository": "local-dev-repo",
+    "branch": "main",
+    "commit_sha": "local-commit-sha",
+    "run_id": "local-run-001",
+    "timestamp": "2026-10-29T07:09:33.664070",
+    "total_tests": 3,
+    "passed_tests": 3,
+    "failed_tests": 0,
+    "overall_status": "PASS",
+    "tests": [
+        {
+            "name": "test_complete_valid_submission (tests.test_submissions.TestAssignmentValidation.test_complete_valid_submission)",
+            "result": "PASS",
+            "message": ""
+        },
+        {
+            "name": "test_invalid_submission_url (tests.test_submissions.TestAssignmentValidation.test_invalid_submission_url)",
+            "result": "PASS",
+            "message": ""
+        },
+        {
+            "name": "test_missing_registration_number (tests.test_submissions.TestAssignmentValidation.test_missing_registration_number)",
+            "result": "PASS",
+            "message": ""
+        }
+    ]
+}
