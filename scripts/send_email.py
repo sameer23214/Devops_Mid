@@ -11,7 +11,7 @@ REPORT_FILE = os.getenv("REPORT_FILE", "test-report.json")
 
 def main() -> int:
     user = os.getenv("EMAIL_USER", "").strip()
-    password = os.getenv("EMAIL_PASS", "").replace(" ", "").strip()  # Gmail shows app passwords with spaces
+    password = os.getenv("EMAIL_PASS", "").replace(" ", "").strip()
     to = os.getenv("EMAIL_TO", "").strip()
     if not (user and password and to):
         print("EMAIL_USER / EMAIL_PASS / EMAIL_TO must all be set.")
@@ -23,8 +23,7 @@ def main() -> int:
     with open(REPORT_FILE, encoding="utf-8") as f:
         report = json.load(f)
 
-    summary = report.get("summary", {})
-    status = str(summary.get("status", "UNKNOWN")).upper()
+    status = str(report.get("overall_status", "UNKNOWN")).upper()
     repo = report.get("repository", "unknown")
     sha = str(report.get("commit_sha", "unknown"))
 
@@ -35,14 +34,14 @@ def main() -> int:
         f"Run ID     : {report.get('run_id', 'unknown')}",
         f"Time (UTC) : {report.get('timestamp', 'unknown')}",
         f"RESULT     : {status}",
-        f"Total {summary.get('total', '?')} | Passed {summary.get('passed', '?')} | Failed {summary.get('failed', '?')}",
+        f"Total {report.get('total_tests', '?')} | Passed {report.get('passed_tests', '?')} | Failed {report.get('failed_tests', '?')}",
         "",
         "Individual tests:",
     ]
     for test in report.get("tests", []):
         lines.append(f"  [{str(test.get('result', '?')).upper()}] {test.get('name', '?')}")
-        if test.get("failure_message"):
-            lines.append(f"      {test['failure_message']}")
+        if test.get("message"):
+            lines.append(f"      {test['message']}")
 
     msg = EmailMessage()
     msg["Subject"] = f"[{status}] {repo} @ {sha[:7]}"

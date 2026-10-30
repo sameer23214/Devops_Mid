@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from tests.test_submissions import TestAssignmentValidation
 
+
 class CustomTestResult(unittest.TestResult):
     def __init__(self):
         super().__init__()
@@ -16,27 +17,16 @@ class CustomTestResult(unittest.TestResult):
 
     def addSuccess(self, test):
         super().addSuccess(test)
-        self.test_details.append({
-            "name": str(test),
-            "result": "PASS",
-            "message": ""
-        })
+        self.test_details.append({"name": str(test), "result": "PASS", "message": ""})
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
-        self.test_details.append({
-            "name": str(test),
-            "result": "FAIL",
-            "message": str(err[1])
-        })
+        self.test_details.append({"name": str(test), "result": "FAIL", "message": str(err[1])})
 
     def addError(self, test, err):
         super().addError(test, err)
-        self.test_details.append({
-            "name": str(test),
-            "result": "ERROR",
-            "message": str(err[1])
-        })
+        self.test_details.append({"name": str(test), "result": "ERROR", "message": str(err[1])})
+
 
 def run_suite():
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(TestAssignmentValidation)
@@ -44,9 +34,7 @@ def run_suite():
     suite.run(result)
 
     total = result.testsRun
-    failures = len(result.failures)
-    errors = len(result.errors)
-    failed_count = failures + errors
+    failed_count = len(result.failures) + len(result.errors)
     passed_count = total - failed_count
     overall_status = "PASS" if failed_count == 0 else "FAIL"
 
@@ -55,7 +43,7 @@ def run_suite():
         "branch": os.getenv("GITHUB_REF_NAME", "main"),
         "commit_sha": os.getenv("GITHUB_SHA", "local-commit-sha"),
         "run_id": os.getenv("GITHUB_RUN_ID", "local-run-001"),
-        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "total_tests": total,
         "passed_tests": passed_count,
         "failed_tests": failed_count,
@@ -63,8 +51,8 @@ def run_suite():
         "tests": result.test_details
     }
 
-    os.path.exists("data") or os.makedirs("data", exist_ok=True)
-    with open("test-report.json", "w") as f:
+    os.makedirs("data", exist_ok=True)
+    with open("test-report.json", "w", encoding="utf-8") as f:
         json.dump(report, f, indent=4)
 
     print("Test Report Generated:")
@@ -73,13 +61,14 @@ def run_suite():
     receiver_url = os.getenv("RECEIVER_URL")
     if receiver_url:
         try:
-            resp = requests.post(receiver_url, json=report, timeout=10)
-            print(f"Report sent to receiver. Status Code: {resp.status_code}")
+            resp = requests.post(receiver_url, json=report, timeout=15)
+            print(f"Report sent to receiver. Status Code: {resp.status_code} {resp.text[:200]}")
         except Exception as e:
             print(f"Failed to send report to receiver: {e}")
 
     if overall_status != "PASS":
         sys.exit(1)
+
 
 if __name__ == "__main__":
     run_suite()
