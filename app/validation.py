@@ -5,7 +5,7 @@ def validate_submission(data):
         return False, "Invalid payload"
     
     name = data.get("name", "").strip()
-    #regNumber = data.get("regNumber", "").strip()
+    regNumber = data.get("regNumber", "").strip()
     title = data.get("title", "").strip()
     url = data.get("url", "").strip()
 
